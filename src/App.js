@@ -26,13 +26,47 @@ const cards = [
 class App extends Component {
   state = { cards: shuffle(cards) };
 
-  onCardStateChange = (cardID) => {
-    let cards = this.state.cards.map((c) => {
-      if (c.id === cardID) {
-        return { ...c, cardState: CardState.SHOWING };
-      } else return c;
-    });
-    this.setState({ cards });
+  onCardClick = (cardID) => {
+    const handleCardsState = function (cards, ids, newState) {
+      return cards.map((c) => {
+        if (ids.includes(c.id)) {
+          return {
+            ...c,
+            cardState: newState,
+          };
+        }
+        return c;
+      });
+    };
+
+    const foundCard = this.state.cards.find((c) => c.id === cardID);
+
+    if (this.state.noClick || foundCard.cardState !== CardState.HIDING) {
+      return;
+    }
+    let noClick = false;
+
+    let cards = handleCardsState(this.state.cards, [cardID], CardState.SHOWING);
+
+    const showingCards = cards.filter((c) => c.cardState === CardState.SHOWING);
+    const ids = showingCards.map((c) => c.id);
+
+    if (
+      showingCards.length === 2 &&
+      showingCards[0].backgroundColor === showingCards[1].backgroundColor
+    ) {
+      cards = handleCardsState(cards, ids, CardState.MATCHING);
+    } else if (showingCards.length === 2) {
+      let hidingCards = handleCardsState(cards, ids, CardState.HIDING);
+      noClick = true;
+      this.setState({ cards, noClick }, () => {
+        setTimeout(() => {
+          this.setState({ cards: hidingCards, noClick: false });
+        }, 1500);
+      });
+      return;
+    }
+    this.setState({ cards, noClick });
   };
 
   handleGameReset = () => {
@@ -54,7 +88,7 @@ class App extends Component {
             card={c}
             showing={c.cardState !== CardState.HIDING}
             key={c.id}
-            onClick={() => this.onCardStateChange(c.id)}
+            onClick={() => this.onCardClick(c.id)}
           />
         ))}
       </div>,
