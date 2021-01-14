@@ -1,0 +1,21 @@
+div.box {
+  height: 100px;
+  width: 100px;
+  margin: 9px;
+  border-radius: 20%;
+  animation: slidein 0.9s ease 0.2s forwards;
+  background-color: #6d6875;
+  transition: 0.4s all ease;
+}
+
+div.box:hover {
+  cursor: pointer;
+  box-shadow: 1px 1px 8px #706f6f;
+  transform: rotateZ(5deg);
+}
+
+/* @keyframes slidein {
+  100% {
+    transform: scale(1);
+  }
+} */
